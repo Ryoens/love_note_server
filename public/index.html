@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>WebSocket Test</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    button { margin-right: 8px; }
+    #log { white-space: pre-wrap; background:#f7f7f7; padding:12px; border:1px solid #ddd; height:200px; overflow:auto; }
+  </style>
+</head>
+<body>
+  <h1>WebSocket 接続デモ</h1>
+  <div>
+    <button id="btnConnect">接続</button>
+    <button id="btnSend">送信</button>
+    <button id="btnClose">切断</button>
+  </div>
+  <div style="margin-top:12px;">
+    <input id="msg" value="Hello WebSocket!" style="width: 300px;" />
+  </div>
+  <h3>ログ</h3>
+  <div id="log"></div>
+
+  <script>
+    const log = (t) => {
+      const el = document.getElementById("log");
+      el.textContent += t + "\n";
+      el.scrollTop = el.scrollHeight;
+    };
+
+    let ws = null;
+
+    document.getElementById("btnConnect").onclick = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        log("すでに接続済みです。");
+        return;
+      }
+      ws = new WebSocket("ws://localhost:8080/ws");
+
+      ws.onopen = () => log("接続: OPEN");
+      ws.onmessage = (e) => log("受信: " + (typeof e.data === "string" ? e.data : "[binary]"));
+      ws.onclose = (e) => log("切断: CLOSE code=" + e.code);
+      ws.onerror = (e) => log("エラー: " + e.message);
+    };
+
+    document.getElementById("btnSend").onclick = () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log("未接続です。先に接続してください。");
+        return;
+      }
+      const text = document.getElementById("msg").value;
+      ws.send(text);
+      log("送信: " + text);
+    };
+
+    document.getElementById("btnClose").onclick = () => {
+      if (ws) ws.close(1000, "bye");
+    };
+  </script>
+</body>
+</html>

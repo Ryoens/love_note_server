@@ -4,3 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+actix = "0.13.5"
+actix-files = "0.6.6"
+actix-rt = "2.10.0"
+actix-web = "4.11.0"
+actix-web-actors = "4.3.1"
+actix-ws = "0.3.0"
+env_logger = "0.11.8"
+futures-util = { version = "0.3", features = ["sink"] }
+rand = "0.9.2"
