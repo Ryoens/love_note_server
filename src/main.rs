@@ -39,7 +39,7 @@ async fn ws_handler(
 ) -> Result<HttpResponse, Error> {
     let room_name = req.query_string().split('=').nth(1).unwrap_or("default").to_string();
     let (res, mut session, mut stream) = handle(&req, body)?;
-    println!("WebSocket接続: {}", req.peer_addr().map(|a| a.to_string()).unwrap_or("不明".into()));
+    println!("Connected from client: {}", req.peer_addr().map(|a| a.to_string()).unwrap_or("不明".into()));
 
     // クライアント識別ID
     let mut rng = rand::thread_rng();
@@ -94,12 +94,11 @@ async fn ws_handler(
                 }
                 Message::Binary(_) => {}
                 Message::Ping(bytes) => {
-                    info!("Ping received from client {}", id);
+                    println!("Received: id={} {:?}", id, bytes);
                     let _ = session.pong(&bytes).await;
                 }
                 Message::Close(reason) => {
-                    info!("クライアント切断 id={} reason={:?}", id, reason);
-                    println!("❌ 接続が終了しました: {:?}", reason);
+                    println!("disconnected from client: {:?}", reason);
                     let _ = session.close(reason).await;
                     break;
                 }
